@@ -1,0 +1,23 @@
+info:
+  contact: {}
+  title: stori_challenge
+  version: 0.0.0
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Return a json content with a welcome message
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Demo data
+          schema:
+            type: string
+        "500":
+          description: Something unidentified has occurred
+      summary: Gets a json welcome message
+      tags:
+      - initial
+swagger: "2.0"

@@ -1,0 +1,22 @@
+run:
+  skip-dirs:
+    - mocks
+    - pkg/testfunc
+    - cmd/testing
+  skip-files:
+    - ".*_test.go$"
+  go: "1.20"
+
+linters:
+  enable:
+    - funlen
+    - dupl
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - ireturn
+    - testpackage
+    - varnamelen
+    - wastedassign
+    - whitespace

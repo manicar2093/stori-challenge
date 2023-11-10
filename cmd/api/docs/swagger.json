@@ -1,0 +1,36 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "\u003cproject_name\u003e",
+        "contact": {},
+        "version": "0.0.0"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Return a json content with a welcome message",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "initial"
+                ],
+                "summary": "Gets a json welcome message",
+                "responses": {
+                    "200": {
+                        "description": "Demo data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Something unidentified has occurred"
+                    }
+                }
+            }
+        }
+    }
+}
