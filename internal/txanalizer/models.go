@@ -1,64 +1,44 @@
 package txanalizer
 
 import (
-	"fmt"
-	"strings"
+	"io"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type (
 	Transaction struct {
-		Id     uint
-		Date   Date
-		Amount float64
+		Id        uint
+		AccountId uuid.UUID
+		Date      Date
+		Amount    float64
 	}
 
+	TransactionByMonth map[time.Month]uint
+
 	TransactionsAnalizys struct {
-		TotalBalance       float64
-		TransactionByMonth struct {
-			Month    string
-			Quantity uint
-		}
+		TotalBalance        float64
+		TransactionByMonth  TransactionByMonth
 		AverageDebitAmount  float64
 		AverageCreditAmount float64
 	}
 
-	Date time.Time
+	CreateAccountTransactionsInput struct {
+		Transactions []Transaction
+		AccountId    uuid.UUID
+	}
+
+	SendAccountDetailsEmailInput struct {
+		TransactionsAnalyzis TransactionsAnalizys
+		TransactionsCsvFile  io.Reader
+	}
+
+	AnalyzeAccountTransactionsInput struct {
+		TransactionsFilePath string
+	}
+
+	AnalyzeAccountTransactionsOutput struct {
+		EmailId uuid.UUID
+	}
 )
-
-func (c *Date) UnmarshalJSON(data []byte) error {
-	return c.unmarshal(data)
-}
-
-func (c Date) MarshalJSON() ([]byte, error) {
-	return c.marshal()
-}
-
-func (c Date) MarshalCSV() ([]byte, error) {
-	return c.marshal()
-}
-
-func (c *Date) UnmarshalCSV(data []byte) error {
-	return c.unmarshal(data)
-}
-
-func (c Date) Day() int {
-	return time.Time(c).Day()
-}
-
-func (c *Date) unmarshal(data []byte) (err error) {
-	s := strings.Trim(string(data), "\"")
-	if s == "null" {
-		return
-	}
-	parsedTime, err := time.Parse(time.DateOnly, s)
-	if err != nil {
-		return
-	}
-	*c = Date(parsedTime)
-	return
-}
-
-func (c Date) marshal() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%s\"", time.Time(c).Format(time.DateOnly))), nil
-}

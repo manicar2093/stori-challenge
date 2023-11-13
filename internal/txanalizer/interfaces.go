@@ -1,7 +1,15 @@
 package txanalizer
 
-type (
-	TransactionRepository interface{}
+import "github.com/google/uuid"
 
-	EmailSender interface{}
+type (
+	TransactionRepository interface {
+		Create(input CreateAccountTransactionsInput) error
+	}
+
+	EmailSender interface {
+		SendAccountDetailsEmail(input SendAccountDetailsEmailInput) (uuid.UUID, error)
+	}
+
+	UUIDCreator func() uuid.UUID
 )
