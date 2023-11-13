@@ -5,3 +5,4 @@ node_modules
 .Ds_Store
 .bin
 temp
+/venv
