@@ -19,4 +19,4 @@ COPY --from=builder /app/server /server
 
 EXPOSE 8000
 
-CMD [ "/server" ]
+CMD [ "/server", "--port", "8000"]
