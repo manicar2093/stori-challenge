@@ -25,9 +25,9 @@ var _ = Describe("Turso", func() {
 				expectedAccountId = uuid.New()
 				input             = txanalizer.CreateAccountTransactionsInput{
 					Transactions: []txanalizer.Transaction{
-						{Id: 0, AccountId: expectedAccountId, Date: txanalizer.NewDate(time.November, 11)},
-						{Id: 1, AccountId: expectedAccountId, Date: txanalizer.NewDate(time.November, 12)},
-						{Id: 2, AccountId: expectedAccountId, Date: txanalizer.NewDate(time.November, 13)},
+						{Id: 0, Amount: 14.2, AccountId: expectedAccountId, Date: txanalizer.NewDate(time.November, 11)},
+						{Id: 1, Amount: 15.3, AccountId: expectedAccountId, Date: txanalizer.NewDate(time.November, 12)},
+						{Id: 2, Amount: 16.4, AccountId: expectedAccountId, Date: txanalizer.NewDate(time.November, 13)},
 					},
 					AccountId: expectedAccountId,
 				}
@@ -36,11 +36,7 @@ var _ = Describe("Turso", func() {
 			Expect(repo.Create(input)).To(Succeed())
 
 			var found txanalizer.Transaction
-			if err := conn.QueryRow(
-				"SELECT * FROM TRANSACTIONS WHERE id = 0",
-			).Scan(&found.Id, &found.Amount, &found.Date, &found.AccountId); err != nil {
-				Fail(err.Error())
-			}
+			conn.Where("id = 0").First(&found)
 			Expect(found.AccountId).To(Equal(expectedAccountId))
 		})
 	})
