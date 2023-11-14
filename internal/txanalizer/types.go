@@ -6,10 +6,19 @@ import (
 	"time"
 )
 
-type Date time.Time
+const dateFormat = "1/2"
 
-func NewDate(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.Location) Date {
-	return Date(time.Date(year, time.Month(month), day, hour, min, sec, nsec, loc))
+type Date struct {
+	day   int
+	month time.Month
+}
+
+func NewDate(year int, month time.Month, day int) Date {
+	d := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Local)
+	return Date{
+		day:   d.Day(),
+		month: d.Month(),
+	}
 }
 
 func (c *Date) UnmarshalJSON(data []byte) error {
@@ -29,7 +38,11 @@ func (c *Date) UnmarshalCSV(data []byte) error {
 }
 
 func (c Date) Day() int {
-	return time.Time(c).Day()
+	return c.day
+}
+
+func (c Date) Month() time.Month {
+	return c.month
 }
 
 func (c *Date) unmarshal(data []byte) (err error) {
@@ -37,14 +50,17 @@ func (c *Date) unmarshal(data []byte) (err error) {
 	if s == "null" {
 		return
 	}
-	parsedTime, err := time.Parse(time.DateOnly, s)
+	parsedTime, err := time.Parse(dateFormat, s)
 	if err != nil {
 		return
 	}
-	*c = Date(parsedTime)
+	*c = Date{
+		day:   parsedTime.Day(),
+		month: parsedTime.Month(),
+	}
 	return
 }
 
 func (c Date) marshal() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%s\"", time.Time(c).Format(time.DateOnly))), nil
+	return []byte(fmt.Sprintf("%d/%d", c.month, c.day)), nil
 }
