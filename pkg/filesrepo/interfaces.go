@@ -1,4 +1,4 @@
-package filestores
+package filesrepo
 
 import "github.com/manicar2093/filestores"
 

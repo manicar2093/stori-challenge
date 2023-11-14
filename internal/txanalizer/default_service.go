@@ -2,23 +2,23 @@ package txanalizer
 
 import (
 	"encoding/csv"
-	"log"
 
 	"github.com/jszwec/csvutil"
-	filestores "github.com/manicar2093/stori-challenge/pkg/filesrepo"
+	"github.com/manicar2093/filestores"
+	"github.com/manicar2093/stori-challenge/pkg/filesrepo"
 )
 
 type DefaultService struct {
 	transactionsRepo TransactionRepository
 	emailSender      EmailSender
-	filestore        filestores.FileStore
+	filestore        filesrepo.FileStore
 	uuidGenerator    UUIDCreator
 }
 
 func NewDefaultService(
 	transactionsRepo TransactionRepository,
 	emailSender EmailSender,
-	filestor filestores.FileStore,
+	filestor filesrepo.FileStore,
 	uuidGenerator UUIDCreator,
 ) *DefaultService {
 	return &DefaultService{
@@ -32,28 +32,62 @@ func NewDefaultService(
 func (c *DefaultService) AnalyzeAccountTransactions(
 	input AnalyzeAccountTransactionsInput,
 ) (AnalyzeAccountTransactionsOutput, error) {
-	objectInfo, err := c.filestore.Get(input.TransactionsFilePath)
+	transactions, objectInfo, err := c.getTransactionsFromCsv(input)
 	if err != nil {
 		return AnalyzeAccountTransactionsOutput{}, err
 	}
 
-	decoder, err := csvutil.NewDecoder(csv.NewReader(objectInfo.Reader))
+	analizys := doAnalizys(transactions)
+
+	if err := c.transactionsRepo.Create(CreateAccountTransactionsInput{
+		Transactions: transactions,
+		AccountId:    c.uuidGenerator(),
+	}); err != nil {
+		return AnalyzeAccountTransactionsOutput{}, err
+	}
+
+	emailId, err := c.emailSender.SendAccountDetailsEmail(SendAccountDetailsEmailInput{
+		TransactionsAnalyzis: analizys,
+		TransactionsCsvFile:  objectInfo.Reader,
+	})
 	if err != nil {
 		return AnalyzeAccountTransactionsOutput{}, err
 	}
+
+	return AnalyzeAccountTransactionsOutput{
+		EmailId: emailId,
+	}, nil
+}
+
+func (c *DefaultService) getTransactionsFromCsv(
+	input AnalyzeAccountTransactionsInput,
+) ([]Transaction, filestores.ObjectInfo, error) {
+	objectInfo, err := c.filestore.Get(input.TransactionsFilePath)
+	if err != nil {
+		return nil, filestores.ObjectInfo{}, err
+	}
+
+	decoder, err := csvutil.NewDecoder(csv.NewReader(objectInfo.Reader))
+	if err != nil {
+		return nil, objectInfo, err
+	}
 	var transactions []Transaction
 	if err := decoder.Decode(&transactions); err != nil {
-		return AnalyzeAccountTransactionsOutput{}, err
+		return nil, objectInfo, err
 	}
+
+	return transactions, objectInfo, nil
+}
+
+func doAnalizys(transactions []Transaction) TransactionsAnalizys {
 	var (
-		analizys             = NewTransactionAnalizys()
-		creditAmount float64 = 0
-		creditCount          = 0
-		debitAmount  float64 = 0
-		debitCount           = 0
+		analizys     = NewTransactionAnalizys()
+		creditAmount float64
+		creditCount  uint
+		debitAmount  float64
+		debitCount   uint
 	)
 	for _, tx := range transactions { //nolint: varnamelen
-		log.Println(tx.Date)
 		if tx.Amount > 0 {
 			creditCount++
 			creditAmount += tx.Amount
@@ -67,22 +101,5 @@ func (c *DefaultService) AnalyzeAccountTransactions(
 	analizys.AverageCreditAmount = creditAmount / float64(creditCount)
 	analizys.AverageDebitAmount = debitAmount / float64(debitCount)
 
-	if err := c.transactionsRepo.Create(CreateAccountTransactionsInput{
-		Transactions: transactions,
-		AccountId:    c.uuidGenerator(),
-	}); err != nil {
-		return AnalyzeAccountTransactionsOutput{}, err
-	}
-
-	emailId, err := c.emailSender.SendAccountDetailsEmail(SendAccountDetailsEmailInput{
-		TransactionsAnalyzis: *analizys,
-		TransactionsCsvFile:  objectInfo.Reader,
-	})
-	if err != nil {
-		return AnalyzeAccountTransactionsOutput{}, err
-	}
-
-	return AnalyzeAccountTransactionsOutput{
-		EmailId: emailId,
-	}, nil
+	return *analizys
 }
