@@ -86,5 +86,5 @@ func (c *Server) configControllers() {
 	for _, controller := range c.controllers {
 		controller.SetUpRoutes(c.baseEndpoint)
 	}
-	echoroutesview.RegisterRoutesViewer(c.echoInstance)
+	echoroutesview.RegisterRoutesViewer(c.echoInstance) //nolint: errcheck
 }
