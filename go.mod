@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/gookit/validate v1.4.6
 	github.com/huandu/go-sqlbuilder v1.23.0
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/jszwec/csvutil v1.8.0
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/manicar2093/echoroutesview v0.1.0
@@ -64,7 +65,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
