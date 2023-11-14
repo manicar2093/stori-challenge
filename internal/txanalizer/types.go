@@ -13,8 +13,8 @@ type Date struct {
 	month time.Month
 }
 
-func NewDate(year int, month time.Month, day int) Date {
-	d := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Local)
+func NewDate(month time.Month, day int) Date {
+	d := time.Date(0, time.Month(month), day, 0, 0, 0, 0, time.Local)
 	return Date{
 		day:   d.Day(),
 		month: d.Month(),

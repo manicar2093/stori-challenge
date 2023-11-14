@@ -48,22 +48,22 @@ var _ = Describe("DefaultService", func() {
 				transactions                 = []txanalizer.Transaction{
 					{
 						Id:     0,
-						Date:   txanalizer.NewDate(2023, time.July, 15),
+						Date:   txanalizer.NewDate(time.July, 15),
 						Amount: 60.5,
 					},
 					{
 						Id:     1,
-						Date:   txanalizer.NewDate(2023, time.July, 28),
+						Date:   txanalizer.NewDate(time.July, 28),
 						Amount: -10.3,
 					},
 					{
 						Id:     2,
-						Date:   txanalizer.NewDate(2023, time.August, 2),
+						Date:   txanalizer.NewDate(time.August, 2),
 						Amount: -20.46,
 					},
 					{
 						Id:     3,
-						Date:   txanalizer.NewDate(2023, time.August, 13),
+						Date:   txanalizer.NewDate(time.August, 13),
 						Amount: 10,
 					},
 				}
