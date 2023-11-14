@@ -1,7 +1,9 @@
 package txanalizer
 
 import (
+	"database/sql/driver"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -35,6 +37,26 @@ func (c Date) MarshalCSV() ([]byte, error) {
 
 func (c *Date) UnmarshalCSV(data []byte) error {
 	return c.unmarshal(data)
+}
+
+func (c *Date) Scan(src any) error {
+	asString := src.(string)
+	splitted := strings.Split(asString, "/")
+	month, err := strconv.Atoi(splitted[0])
+	if err != nil {
+		return err
+	}
+	day, err := strconv.Atoi(splitted[1])
+	if err != nil {
+		return err
+	}
+	c.month = time.Month(month)
+	c.day = day
+	return nil
+}
+
+func (c Date) Value() (driver.Value, error) {
+	return fmt.Sprintf("%d/%d", c.month, c.day), nil
 }
 
 func (c Date) Day() int {

@@ -41,7 +41,7 @@ var _ = Describe("Turso", func() {
 			).Scan(&found.Id, &found.Amount, &found.Date, &found.AccountId); err != nil {
 				Fail(err.Error())
 			}
-			Expect(found.AccountId).To(Equal(expectedAccountId.String()))
+			Expect(found.AccountId).To(Equal(expectedAccountId))
 		})
 	})
 

@@ -7,7 +7,6 @@ import (
 	_ "github.com/libsql/libsql-client-go/libsql"
 	"github.com/manicar2093/stori-challenge/pkg/config"
 	"github.com/manicar2093/stori-challenge/pkg/logger"
-	_ "modernc.org/sqlite"
 )
 
 var (
@@ -16,6 +15,7 @@ var (
 )
 
 func GetTursoConnection() *sql.DB {
+	println(config.Instance.DatabaseURL)
 	if singleConn == nil {
 		once.Do(func() {
 			db, err := sql.Open("libsql", config.Instance.DatabaseURL)
