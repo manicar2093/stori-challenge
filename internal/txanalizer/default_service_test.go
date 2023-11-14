@@ -24,7 +24,7 @@ var _ = Describe("DefaultService", func() {
 
 	var (
 		transactionsRepoMock *mocks.TransactionRepository
-		emailSenderMock      *mocks.EmailSender
+		notificatorMock      *mocks.Notificator
 		fileRepoMock         *mocks.FileStore
 		uuidGeneratorMock    *mocks.UUIDCreator
 		service              *txanalizer.DefaultService
@@ -33,10 +33,10 @@ var _ = Describe("DefaultService", func() {
 	BeforeEach(func() {
 		T := GinkgoT()
 		transactionsRepoMock = mocks.NewTransactionRepository(T)
-		emailSenderMock = mocks.NewEmailSender(T)
+		notificatorMock = mocks.NewNotificator(T)
 		uuidGeneratorMock = mocks.NewUUIDCreator(T)
 		fileRepoMock = mocks.NewFileStore(T)
-		service = txanalizer.NewDefaultService(transactionsRepoMock, emailSenderMock, fileRepoMock, uuidGeneratorMock.Execute)
+		service = txanalizer.NewDefaultService(transactionsRepoMock, notificatorMock, fileRepoMock, uuidGeneratorMock.Execute)
 	})
 
 	Describe("AnalyzeAccountTransactions", func() {
@@ -84,20 +84,18 @@ var _ = Describe("DefaultService", func() {
 					},
 					TransactionsCsvFile: expectedObjectInfo.Reader,
 				}
-				emailIdReturn = uuid.New()
-				input         = txanalizer.AnalyzeAccountTransactionsInput{
+				input = txanalizer.AnalyzeAccountTransactionsInput{
 					TransactionsFilePath: expectedTransactionsFilePath,
 				}
 			)
 			fileRepoMock.EXPECT().Get(expectedTransactionsFilePath).Return(expectedObjectInfo, nil)
 			transactionsRepoMock.EXPECT().Create(createAccountTransactionsInput).Return(nil)
-			emailSenderMock.EXPECT().SendAccountDetailsEmail(sendAccountDetailsEmailInput).Return(emailIdReturn, nil)
+			notificatorMock.EXPECT().SendAccountDetailsEmail(sendAccountDetailsEmailInput).Return(nil)
 			uuidGeneratorMock.EXPECT().Execute().Return(expectedAccountUuid)
 
-			got, err := service.AnalyzeAccountTransactions(input)
+			err := service.AnalyzeAccountTransactions(input)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(got.EmailId).To(Equal(emailIdReturn))
 		})
 	})
 

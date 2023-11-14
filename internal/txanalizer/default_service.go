@@ -10,14 +10,14 @@ import (
 
 type DefaultService struct {
 	transactionsRepo TransactionRepository
-	emailSender      EmailSender
+	emailSender      Notificator
 	filestore        filesrepo.FileStore
 	uuidGenerator    UUIDCreator
 }
 
 func NewDefaultService(
 	transactionsRepo TransactionRepository,
-	emailSender EmailSender,
+	emailSender Notificator,
 	filestor filesrepo.FileStore,
 	uuidGenerator UUIDCreator,
 ) *DefaultService {
@@ -31,10 +31,10 @@ func NewDefaultService(
 
 func (c *DefaultService) AnalyzeAccountTransactions(
 	input AnalyzeAccountTransactionsInput,
-) (AnalyzeAccountTransactionsOutput, error) {
+) error {
 	transactions, objectInfo, err := c.getTransactionsFromCsv(input)
 	if err != nil {
-		return AnalyzeAccountTransactionsOutput{}, err
+		return err
 	}
 
 	analizys := doAnalizys(transactions)
@@ -43,20 +43,17 @@ func (c *DefaultService) AnalyzeAccountTransactions(
 		Transactions: transactions,
 		AccountId:    c.uuidGenerator(),
 	}); err != nil {
-		return AnalyzeAccountTransactionsOutput{}, err
+		return err
 	}
 
-	emailId, err := c.emailSender.SendAccountDetailsEmail(SendAccountDetailsEmailInput{
+	if err := c.emailSender.SendAccountDetailsEmail(SendAccountDetailsEmailInput{
 		TransactionsAnalyzis: analizys,
 		TransactionsCsvFile:  objectInfo.Reader,
-	})
-	if err != nil {
-		return AnalyzeAccountTransactionsOutput{}, err
+	}); err != nil {
+		return err
 	}
 
-	return AnalyzeAccountTransactionsOutput{
-		EmailId: emailId,
-	}, nil
+	return nil
 }
 
 func (c *DefaultService) getTransactionsFromCsv(
