@@ -13,6 +13,13 @@ import (
 	"github.com/manicar2093/stori-challenge/mocks"
 )
 
+func mustOrFail[T any](ret T, err error) T {
+	if err != nil {
+		Fail(err.Error())
+	}
+	return ret
+}
+
 var _ = Describe("DefaultService", func() {
 
 	var (
@@ -36,34 +43,34 @@ var _ = Describe("DefaultService", func() {
 		It("sends an email with calculated account data", func() {
 			var (
 				expectedTransactionsFilePath = "account_details_test.csv"
-				expectedTransactionCsvFile   *os.File
-				expectedObjectInfo           filestores.ObjectInfo
+				expectedTransactionCsvFile   = mustOrFail(os.Open(expectedTransactionsFilePath))
+				expectedObjectInfo           = mustOrFail(filestores.FileToStoreInfo(expectedTransactionCsvFile))
 				transactions                 = []txanalizer.Transaction{
 					{
 						Id:     0,
-						Date:   txanalizer.NewDate(2023, time.July, 15, 0, 0, 0, 0, time.UTC),
+						Date:   txanalizer.NewDate(2023, time.July, 15),
 						Amount: 60.5,
 					},
 					{
 						Id:     1,
-						Date:   txanalizer.NewDate(2023, time.July, 28, 0, 0, 0, 0, time.UTC),
+						Date:   txanalizer.NewDate(2023, time.July, 28),
 						Amount: -10.3,
 					},
 					{
 						Id:     2,
-						Date:   txanalizer.NewDate(2023, time.August, 2, 0, 0, 0, 0, time.UTC),
+						Date:   txanalizer.NewDate(2023, time.August, 2),
 						Amount: -20.46,
 					},
 					{
 						Id:     3,
-						Date:   txanalizer.NewDate(2023, time.August, 13, 0, 0, 0, 0, time.UTC),
+						Date:   txanalizer.NewDate(2023, time.August, 13),
 						Amount: 10,
 					},
 				}
-				expectedUuidReturn             = uuid.New()
+				expectedAccountUuid            = uuid.New()
 				createAccountTransactionsInput = txanalizer.CreateAccountTransactionsInput{
 					Transactions: transactions,
-					AccountId:    expectedUuidReturn,
+					AccountId:    expectedAccountUuid,
 				}
 				sendAccountDetailsEmailInput = txanalizer.SendAccountDetailsEmailInput{
 					TransactionsAnalyzis: txanalizer.TransactionsAnalizys{
@@ -75,7 +82,7 @@ var _ = Describe("DefaultService", func() {
 						AverageDebitAmount:  -15.38,
 						AverageCreditAmount: 35.25,
 					},
-					TransactionsCsvFile: expectedTransactionCsvFile,
+					TransactionsCsvFile: expectedObjectInfo.Reader,
 				}
 				emailIdReturn = uuid.New()
 				input         = txanalizer.AnalyzeAccountTransactionsInput{
@@ -83,9 +90,9 @@ var _ = Describe("DefaultService", func() {
 				}
 			)
 			fileRepoMock.EXPECT().Get(expectedTransactionsFilePath).Return(expectedObjectInfo, nil)
-			transactionsRepoMock.EXPECT().Create(&createAccountTransactionsInput).Return(nil)
+			transactionsRepoMock.EXPECT().Create(createAccountTransactionsInput).Return(nil)
 			emailSenderMock.EXPECT().SendAccountDetailsEmail(sendAccountDetailsEmailInput).Return(emailIdReturn, nil)
-			uuidGeneratorMock.EXPECT().Execute().Return(emailIdReturn)
+			uuidGeneratorMock.EXPECT().Execute().Return(expectedAccountUuid)
 
 			got, err := service.AnalyzeAccountTransactions(input)
 

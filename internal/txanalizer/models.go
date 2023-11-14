@@ -9,10 +9,10 @@ import (
 
 type (
 	Transaction struct {
-		Id        uint
-		AccountId uuid.UUID
-		Date      Date
-		Amount    float64
+		Id        uint      `csv:"Id"`
+		AccountId uuid.UUID `csv:"-"`
+		Date      Date      `csv:"Date"`
+		Amount    float64   `csv:"Transaction"`
 	}
 
 	TransactionByMonth map[time.Month]uint
@@ -42,3 +42,9 @@ type (
 		EmailId uuid.UUID
 	}
 )
+
+func NewTransactionAnalizys() *TransactionsAnalizys {
+	return &TransactionsAnalizys{
+		TransactionByMonth: make(TransactionByMonth),
+	}
+}
