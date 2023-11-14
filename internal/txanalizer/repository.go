@@ -1,17 +1,15 @@
 package txanalizer
 
 import (
-	"database/sql"
-	"errors"
-
 	"github.com/huandu/go-sqlbuilder"
+	"github.com/manicar2093/stori-challenge/pkg/connections"
 )
 
 type TursoRepository struct {
-	conn *sql.DB
+	conn *connections.DBWPaginator
 }
 
-func NewTursoRepository(conn *sql.DB) *TursoRepository {
+func NewTursoRepository(conn *connections.DBWPaginator) *TursoRepository {
 	return &TursoRepository{
 		conn: conn,
 	}
@@ -26,19 +24,10 @@ func (c *TursoRepository) Create(input CreateAccountTransactionsInput) error {
 	}
 
 	sql, args := builder.Build()
-	println(sql)
 
-	res, err := c.conn.Exec(sql, args...)
-	if err != nil {
-		return err
+	if res := c.conn.Exec(sql, args...); res.Error != nil {
+		return res.Error
 	}
 
-	affected, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if affected <= 0 {
-		return errors.New("no data inserted/any row affected")
-	}
 	return nil
 }
