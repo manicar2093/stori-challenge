@@ -9,7 +9,7 @@ import (
 
 type (
 	Transaction struct {
-		Id        uint      `csv:"Id"`
+		Id        uint      `csv:"-" gorm:"primaryKey;autoIncrement;->"`
 		AccountId uuid.UUID `csv:"-"`
 		Date      Date      `csv:"Date"`
 		Amount    float64   `csv:"Transaction"`

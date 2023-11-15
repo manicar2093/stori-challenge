@@ -6,6 +6,7 @@ import (
 	"net/smtp"
 	"time"
 
+	"github.com/coditory/go-errors"
 	"github.com/jordan-wright/email"
 )
 
@@ -56,17 +57,9 @@ func NewMailgun(sender EmailSender, config MailgunConfig) *Mailgun {
 }
 
 func (c Mailgun) SendAccountDetailsEmail(input SendAccountDetailsEmailInput) error {
-	tpl, err := template.New("emailContent").Funcs(template.FuncMap{
-		"getMonthName": func(month time.Month) string {
-			return monthsInSpanish[month]
-		},
-	}).Parse(accountStatusHtmlTemplate)
+	tplContent, err := renderEmailTemplate(input.TransactionsAnalyzis)
 	if err != nil {
-		return err
-	}
-	tplContent := new(bytes.Buffer)
-	if err := tpl.Execute(tplContent, input.TransactionsAnalyzis); err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 
 	newEmail := email.NewEmail()
@@ -74,6 +67,23 @@ func (c Mailgun) SendAccountDetailsEmail(input SendAccountDetailsEmailInput) err
 	newEmail.To = []string{c.config.EmailTo}
 	newEmail.From = c.config.EmailFrom
 	newEmail.Subject = "Your account status"
-	newEmail.HTML = tplContent.Bytes()
+	newEmail.HTML = tplContent
 	return c.sender(newEmail, c.config)
+}
+
+func renderEmailTemplate(transactionAnalizys TransactionsAnalizys) ([]byte, error) {
+	tpl, err := template.New("emailContent").Funcs(template.FuncMap{
+		"getMonthName": func(month time.Month) string {
+			return monthsInSpanish[month]
+		},
+	}).Parse(accountStatusHtmlTemplate)
+	if err != nil {
+		return nil, errors.Wrap(err)
+	}
+	tplContent := new(bytes.Buffer)
+	if err := tpl.Execute(tplContent, transactionAnalizys); err != nil {
+		return nil, errors.Wrap(err)
+	}
+
+	return tplContent.Bytes(), nil
 }

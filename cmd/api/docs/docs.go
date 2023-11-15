@@ -41,6 +41,32 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/analyze": {
+            "post": {
+                "description": "Analyze a transactions file and send an email with generated data",
+                "tags": [
+                    "transaction_analyzer"
+                ],
+                "summary": "Analyze a transactions file",
+                "responses": {
+                    "200": {
+                        "description": "Confirmation message",
+                        "schema": {
+                            "$ref": "#/definitions/echo.Map"
+                        }
+                    },
+                    "500": {
+                        "description": "Something unidentified has occurred"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "echo.Map": {
+            "type": "object",
+            "additionalProperties": true
         }
     }
 }`
@@ -49,7 +75,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.0.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "stori_challenge",
 	Description:      "",
