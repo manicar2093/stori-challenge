@@ -1,0 +1,33 @@
+service: stori-challenge
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: dev
+  region: us-east-2
+
+plugins:
+  - serverless-prune-plugin
+
+custom:
+  prune:
+    automatic: true
+    number: 2
+
+package:
+  patterns:
+    - '!./**'
+    - './.bin/aws/lambda/**'
+
+functions:
+  analyse_transactions:
+    name: analyse_transactions-${sls:stage}
+    handler: .bin/aws/lambda/analyse_transactions
+    environment:
+      TURSO_AUTH_TOKEN: toke
+      TURSO_DATABASE: database_url
+      DATABASE_URL: database
+      ENVIRONMENT: dev
+
+
