@@ -14,6 +14,8 @@ custom:
   prune:
     automatic: true
     number: 2
+  s3:
+    accountTxFilesBucketName: account_tx_file_${sls:stage}
 
 package:
   patterns:
@@ -24,10 +26,38 @@ functions:
   analyse_transactions:
     name: analyse_transactions-${sls:stage}
     handler: .bin/aws/lambda/analyse_transactions
+    role: AccountTxFilesLambdaRole
     environment:
       TURSO_AUTH_TOKEN: toke
       TURSO_DATABASE: database_url
       DATABASE_URL: database
       ENVIRONMENT: dev
+
+resources:
+  Resources:
+    AccountTxFiles:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.s3.accountTxFilesBucketName}
+
+  AccountTxFilesLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: S3AccessPolicy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                  Resource: arn:aws:s3:::${self:custom.s3.accountTxFilesBucketName}/*
 
 
