@@ -1,10 +1,28 @@
 package txanalizer
 
 import (
+	"bytes"
+	"html/template"
 	"net/smtp"
+	"time"
 
 	"github.com/jordan-wright/email"
 )
+
+var monthsInSpanish = map[time.Month]string{
+	time.January:   "Enero",
+	time.February:  "Febrero",
+	time.March:     "Marzo",
+	time.April:     "Abril",
+	time.May:       "Mayo",
+	time.June:      "Junio",
+	time.July:      "Julio",
+	time.August:    "Agosto",
+	time.September: "Septiembre",
+	time.October:   "Octubre",
+	time.November:  "Noviembre",
+	time.December:  "Diciembre",
+}
 
 type (
 	Mailgun struct {
@@ -38,11 +56,24 @@ func NewMailgun(sender EmailSender, config MailgunConfig) *Mailgun {
 }
 
 func (c Mailgun) SendAccountDetailsEmail(input SendAccountDetailsEmailInput) error {
+	tpl, err := template.New("emailContent").Funcs(template.FuncMap{
+		"getMonthName": func(month time.Month) string {
+			return monthsInSpanish[month]
+		},
+	}).Parse(accountStatusHtmlTemplate)
+	if err != nil {
+		return err
+	}
+	tplContent := new(bytes.Buffer)
+	if err := tpl.Execute(tplContent, input.TransactionsAnalyzis); err != nil {
+		return err
+	}
+
 	newEmail := email.NewEmail()
 	newEmail.Attach(input.TransactionsCsvFile, "transations.csv", "text/csv")
 	newEmail.To = []string{c.config.EmailTo}
 	newEmail.From = c.config.EmailFrom
 	newEmail.Subject = "Your account status"
-	newEmail.HTML = []byte("asdfasdf")
+	newEmail.HTML = tplContent.Bytes()
 	return c.sender(newEmail, c.config)
 }
