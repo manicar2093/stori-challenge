@@ -1,3 +1,8 @@
+basePath: /api/v1
+definitions:
+  echo.Map:
+    additionalProperties: true
+    type: object
 info:
   contact: {}
   title: stori_challenge
@@ -20,4 +25,17 @@ paths:
       summary: Gets a json welcome message
       tags:
       - initial
+  /analyze:
+    post:
+      description: Analyze a transactions file and send an email with generated data
+      responses:
+        "200":
+          description: Confirmation message
+          schema:
+            $ref: '#/definitions/echo.Map'
+        "500":
+          description: Something unidentified has occurred
+      summary: Analyze a transactions file
+      tags:
+      - transaction_analyzer
 swagger: "2.0"

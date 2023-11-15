@@ -7,9 +7,16 @@ import (
 var Instance = &config{}
 
 type config struct {
-	Environment string
-	DatabaseURL string
-	PageSize    int64
+	Environment          string
+	DatabaseURL          string
+	TransactionsFilePath string
+	EmailTo              string
+	EmailFrom            string
+	SmtpServer           string
+	SmtpAddr             string
+	SmtpUser             string
+	SmtpPassword         string
+	SmtpHost             string
 }
 
 func init() {
@@ -17,5 +24,12 @@ func init() {
 
 	Instance.Environment = viper.GetString("ENVIRONMENT")
 	Instance.DatabaseURL = viper.GetString("DATABASE_URL")
-	Instance.PageSize = viper.GetInt64("PAGE_SIZE")
+	Instance.TransactionsFilePath = "./files/account_details.csv"
+	Instance.EmailTo = viper.GetString("EMAIL_TO")
+	Instance.EmailFrom = viper.GetString("EMAIL_FROM")
+	Instance.SmtpServer = viper.GetString("SMTP_SERVER")
+	Instance.SmtpAddr = viper.GetString("SMTP_ADDR")
+	Instance.SmtpUser = viper.GetString("SMTP_USER")
+	Instance.SmtpPassword = viper.GetString("SMTP_PASSWORD")
+	Instance.SmtpHost = viper.GetString("SMTP_HOST")
 }

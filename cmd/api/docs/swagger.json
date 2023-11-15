@@ -1,10 +1,11 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "\u003cproject_name\u003e",
+        "title": "stori_challenge",
         "contact": {},
         "version": "0.0.0"
     },
+    "basePath": "/api/v1",
     "paths": {
         "/": {
             "get": {
@@ -31,6 +32,32 @@
                     }
                 }
             }
+        },
+        "/analyze": {
+            "post": {
+                "description": "Analyze a transactions file and send an email with generated data",
+                "tags": [
+                    "transaction_analyzer"
+                ],
+                "summary": "Analyze a transactions file",
+                "responses": {
+                    "200": {
+                        "description": "Confirmation message",
+                        "schema": {
+                            "$ref": "#/definitions/echo.Map"
+                        }
+                    },
+                    "500": {
+                        "description": "Something unidentified has occurred"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "echo.Map": {
+            "type": "object",
+            "additionalProperties": true
         }
     }
 }

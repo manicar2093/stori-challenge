@@ -1,4 +1,4 @@
-.env
+.env.*
 .gitignore
 example.env
 Makefile
@@ -11,3 +11,4 @@ prisma
 Dockerfile
 .golangci.yml
 mocks
+env.demo
