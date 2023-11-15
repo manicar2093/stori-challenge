@@ -8,6 +8,9 @@ else
 	@ go run cmd/api/*.go
 endif
 
+run_demo: build_image
+	@ docker run --rm -e ENVIRONMENT=prod -p 8000:5001 --name stori_challenge-demo stori_challenge:latest
+
 build:
 	@ go build -o ./.bin/api/server cmd/api/*.go
 
