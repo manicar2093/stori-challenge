@@ -2,6 +2,7 @@ package txanalizer
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"net/smtp"
 	"time"
@@ -64,7 +65,7 @@ func (c Mailgun) SendAccountDetailsEmail(input SendAccountDetailsEmailInput) err
 
 	newEmail := email.NewEmail()
 	newEmail.Attach(input.TransactionsCsvFile, "transations.csv", "text/csv")
-	newEmail.To = []string{c.config.EmailTo}
+	newEmail.To = []string{c.config.EmailTo, input.SendTo}
 	newEmail.From = c.config.EmailFrom
 	newEmail.Subject = "Your account status"
 	newEmail.HTML = tplContent
@@ -75,6 +76,9 @@ func renderEmailTemplate(transactionAnalizys TransactionsAnalizys) ([]byte, erro
 	tpl, err := template.New("emailContent").Funcs(template.FuncMap{
 		"getMonthName": func(month time.Month) string {
 			return monthsInSpanish[month]
+		},
+		"formatAmount": func(amount float64) string {
+			return fmt.Sprintf("%.2f", amount)
 		},
 	}).Parse(accountStatusHtmlTemplate)
 	if err != nil {

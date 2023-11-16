@@ -9,7 +9,7 @@ else
 endif
 
 run_demo: build_image
-	@ docker run --rm --env-file ./env.demo -p 8000:5001 --name stori_challenge-demo stori_challenge:latest
+	@ docker run --rm --env-file ./env.demo -p 8000:5001 -v demo_vol:/data --name stori_challenge-demo stori_challenge:latest
 
 build:
 	@ go build -o ./.bin/api/server cmd/api/*.go
@@ -44,3 +44,10 @@ fmt:
 
 version:
 	@ cz version -p
+
+deploy_sls:
+	@ ./scripts/aws/01-aws-lambda-compiler.sh
+	@ dotenv -e .env.dev -- serverless deploy --aws-profile $(AWS_PROFILE_DEPLOY)
+
+remove_sls:
+	@ dotenv -e .env.dev -- serverless remove --aws-profile $(AWS_PROFILE_DEPLOY)

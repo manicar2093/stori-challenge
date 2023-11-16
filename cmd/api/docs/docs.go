@@ -49,6 +49,17 @@ const docTemplate = `{
                     "transaction_analyzer"
                 ],
                 "summary": "Analyze a transactions file",
+                "parameters": [
+                    {
+                        "description": "Data to process request",
+                        "name": "analyze_data_input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/txanalizer.AnalyzeAccountTransactionsInput"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Confirmation message",
@@ -67,6 +78,14 @@ const docTemplate = `{
         "echo.Map": {
             "type": "object",
             "additionalProperties": true
+        },
+        "txanalizer.AnalyzeAccountTransactionsInput": {
+            "type": "object",
+            "properties": {
+                "send_to": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`

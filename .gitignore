@@ -8,3 +8,5 @@ temp
 /venv
 *.db
 .vscode
+.demo_volumen
+.serverless
