@@ -37,7 +37,7 @@ type (
 
 	AnalyzeAccountTransactionsInput struct {
 		TransactionsFilePath string `json:"-"`
-		SendTo               string `json:"send_to" validate:"required,email"`
+		SendTo               string `json:"send_to" validate:"required|email"`
 	}
 
 	AnalyzeAccountTransactionsOutput struct {

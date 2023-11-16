@@ -4,7 +4,7 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: go1.x
-  stage: dev
+  stage: ${env:ENVIRONMENT}
   region: us-east-2
 
 plugins:
@@ -15,7 +15,7 @@ custom:
     automatic: true
     number: 2
   s3:
-    accountTxFilesBucketName: account_tx_file_${sls:stage}
+    storiChallengeBucketName: stori-challenge-bucket-${sls:stage}
 
 package:
   patterns:
@@ -28,19 +28,26 @@ functions:
     handler: .bin/aws/lambda/analyse_transactions
     role: AccountTxFilesLambdaRole
     environment:
-      TURSO_AUTH_TOKEN: toke
-      TURSO_DATABASE: database_url
-      DATABASE_URL: database
-      ENVIRONMENT: dev
+      DATABASE_URL: ${env:DATABASE_URL}
+      ENVIRONMENT: ${env:ENVIRONMENT}
+      EMAIL_TO: ${env:EMAIL_TO}
+      EMAIL_FROM: ${env:EMAIL_FROM}
+      SMTP_SERVER: ${env:SMTP_SERVER}
+      SMTP_ADDR: ${env:SMTP_ADDR}
+      SMTP_USER: ${env:SMTP_USER}
+      SMTP_PASSWORD: ${env:SMTP_PASSWORD}
+      SMTP_HOST: ${env:SMTP_HOST}
+      TRANSACTIONS_FILES_BUCKET_NAME: ${self:custom.s3.storiChallengeBucketName}
+      TRANSACTIONS_FILE_PATH: ${env:TRANSACTIONS_FILE_PATH}
 
 resources:
   Resources:
     AccountTxFiles:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.s3.accountTxFilesBucketName}
+        BucketName: ${self:custom.s3.storiChallengeBucketName}
 
-  AccountTxFilesLambdaRole:
+    AccountTxFilesLambdaRole:
       Type: AWS::IAM::Role
       Properties:
         AssumeRolePolicyDocument:
@@ -57,7 +64,7 @@ resources:
               Statement:
                 - Effect: Allow
                   Action:
-                    - s3:GetObject
-                  Resource: arn:aws:s3:::${self:custom.s3.accountTxFilesBucketName}/*
+                    - s3:*
+                  Resource: arn:aws:s3:::${self:custom.s3.storiChallengeBucketName}/*
 
 

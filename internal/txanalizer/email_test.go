@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/jordan-wright/email"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -55,8 +56,10 @@ var _ = Describe("Email", func() {
 				expectedTransactionCsvFile = strings.NewReader(`Id,Amount,Date
 0,10,7/6
 1,10,7/6`)
-				expectedHtml = []byte("asdfasdf")
-				input        = txanalizer.SendAccountDetailsEmailInput{
+				expectedHtml         = []byte("asdfasdf")
+				expectedInputEmailTo = faker.Email()
+				input                = txanalizer.SendAccountDetailsEmailInput{
+					SendTo: expectedInputEmailTo,
 					TransactionsAnalyzis: txanalizer.TransactionsAnalizys{
 						TotalBalance: 100,
 						TransactionByMonth: txanalizer.TransactionByMonth{
@@ -71,7 +74,7 @@ var _ = Describe("Email", func() {
 			)
 			expectedEmail := email.NewEmail()
 			expectedEmail.Attach(expectedTransactionCsvFile, "transations.csv", "text/csv")
-			expectedEmail.To = []string{expectedEmailTo}
+			expectedEmail.To = []string{expectedEmailTo, expectedInputEmailTo}
 			expectedEmail.From = expectedEmailFrom
 			expectedEmail.Subject = "Your account status"
 			expectedEmail.HTML = expectedHtml

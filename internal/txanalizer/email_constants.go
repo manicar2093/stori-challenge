@@ -151,9 +151,9 @@ const accountStatusHtmlTemplate = `<!DOCTYPE html>
                         </thead>
                         <tbody>
                           <tr>
-                            <td>${{.AverageCreditAmount}}</td>
-                            <td>${{.AverageDebitAmount}}</td>
-                            <td>${{.TotalBalance}}</td>
+                            <td>${{formatAmount .AverageCreditAmount}}</td>
+                            <td>${{formatAmount .AverageDebitAmount}}</td>
+                            <td>${{formatAmount .TotalBalance}}</td>
                           </tr>
                         </tbody>
                       </table>

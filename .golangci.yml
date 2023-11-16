@@ -3,6 +3,7 @@ run:
     - mocks
     - pkg/testfunc
     - cmd/testing
+    - ../../
   skip-files:
     - ".*_test.go$"
   go: "1.21"

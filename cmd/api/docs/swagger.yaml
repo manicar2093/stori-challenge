@@ -3,6 +3,11 @@ definitions:
   echo.Map:
     additionalProperties: true
     type: object
+  txanalizer.AnalyzeAccountTransactionsInput:
+    properties:
+      send_to:
+        type: string
+    type: object
 info:
   contact: {}
   title: stori_challenge
@@ -28,6 +33,13 @@ paths:
   /analyze:
     post:
       description: Analyze a transactions file and send an email with generated data
+      parameters:
+      - description: Data to process request
+        in: body
+        name: analyze_data_input
+        required: true
+        schema:
+          $ref: '#/definitions/txanalizer.AnalyzeAccountTransactionsInput'
       responses:
         "200":
           description: Confirmation message

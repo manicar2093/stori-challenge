@@ -26,13 +26,21 @@ func (c *TransactionAnalyzer) SetUpRoutes(group *echo.Group) {
 //	@Summary		Analyze a transactions file
 //	@Description	Analyze a transactions file and send an email with generated data
 //	@Tags			transaction_analyzer
-//	@Success		200	{object}	echo.Map	"Confirmation message"
-//	@Failure		500	"Something unidentified has occurred"
+//	@Accepts		json
+//	@Param			analyze_data_input	body		txanalizer.AnalyzeAccountTransactionsInput	true	"Data to process request"
+//	@Success		200					{object}	echo.Map									"Confirmation message"
+//	@Failure		500					"Something unidentified has occurred"
 //	@Router			/analyze [post]
 func (c *TransactionAnalyzer) PostAnalyzeTransactions(ctx echo.Context) error {
-	if err := c.service.AnalyzeAccountTransactions(txanalizer.AnalyzeAccountTransactionsInput{
-		TransactionsFilePath: config.Instance.TransactionsFilePath,
-	}); err != nil {
+	req := txanalizer.AnalyzeAccountTransactionsInput{}
+	if err := ctx.Bind(&req); err != nil {
+		return errors.Wrap(err)
+	}
+	if err := ctx.Validate(&req); err != nil {
+		return errors.Wrap(err)
+	}
+	req.TransactionsFilePath = config.Instance.TransactionsFilePath
+	if err := c.service.AnalyzeAccountTransactions(req); err != nil {
 		return errors.Wrap(err)
 	}
 	return ctx.JSON(http.StatusOK, echo.Map{
