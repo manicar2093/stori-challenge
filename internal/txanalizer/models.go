@@ -32,10 +32,12 @@ type (
 	SendAccountDetailsEmailInput struct {
 		TransactionsAnalyzis TransactionsAnalizys
 		TransactionsCsvFile  io.Reader
+		SendTo               string
 	}
 
 	AnalyzeAccountTransactionsInput struct {
-		TransactionsFilePath string
+		TransactionsFilePath string `json:"-"`
+		SendTo               string `json:"send_to" validate:"required,email"`
 	}
 
 	AnalyzeAccountTransactionsOutput struct {

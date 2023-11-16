@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -47,22 +48,18 @@ var _ = Describe("DefaultService", func() {
 				expectedObjectInfo           = mustOrFail(filestores.FileToStoreInfo(expectedTransactionCsvFile))
 				transactions                 = []txanalizer.Transaction{
 					{
-						Id:     0,
 						Date:   txanalizer.NewDate(time.July, 15),
 						Amount: 60.5,
 					},
 					{
-						Id:     1,
 						Date:   txanalizer.NewDate(time.July, 28),
 						Amount: -10.3,
 					},
 					{
-						Id:     2,
 						Date:   txanalizer.NewDate(time.August, 2),
 						Amount: -20.46,
 					},
 					{
-						Id:     3,
 						Date:   txanalizer.NewDate(time.August, 13),
 						Amount: 10,
 					},
@@ -72,23 +69,27 @@ var _ = Describe("DefaultService", func() {
 					Transactions: transactions,
 					AccountId:    expectedAccountUuid,
 				}
-				sendAccountDetailsEmailInput = txanalizer.SendAccountDetailsEmailInput{
-					TransactionsAnalyzis: txanalizer.TransactionsAnalizys{
-						TotalBalance: 39.74,
-						TransactionByMonth: txanalizer.TransactionByMonth{
-							time.July:   2,
-							time.August: 2,
-						},
-						AverageDebitAmount:  -15.38,
-						AverageCreditAmount: 35.25,
+				expectedTransactionsAnalizys = txanalizer.TransactionsAnalizys{
+					TotalBalance: 39.74,
+					TransactionByMonth: txanalizer.TransactionByMonth{
+						time.July:   2,
+						time.August: 2,
 					},
-					TransactionsCsvFile: expectedObjectInfo.Reader,
+					AverageDebitAmount:  -15.38,
+					AverageCreditAmount: 35.25,
+				}
+				expectedEmailTo              = faker.Email()
+				sendAccountDetailsEmailInput = txanalizer.SendAccountDetailsEmailInput{
+					TransactionsAnalyzis: expectedTransactionsAnalizys,
+					TransactionsCsvFile:  expectedObjectInfo.Reader,
+					SendTo:               expectedEmailTo,
 				}
 				input = txanalizer.AnalyzeAccountTransactionsInput{
 					TransactionsFilePath: expectedTransactionsFilePath,
+					SendTo:               expectedEmailTo,
 				}
 			)
-			fileRepoMock.EXPECT().Get(expectedTransactionsFilePath).Return(expectedObjectInfo, nil)
+			fileRepoMock.EXPECT().Get(expectedTransactionsFilePath).Return(expectedObjectInfo, nil).Twice()
 			transactionsRepoMock.EXPECT().Create(createAccountTransactionsInput).Return(nil)
 			notificatorMock.EXPECT().SendAccountDetailsEmail(sendAccountDetailsEmailInput).Return(nil)
 			uuidGeneratorMock.EXPECT().Execute().Return(expectedAccountUuid)
