@@ -66,5 +66,11 @@ resources:
                   Action:
                     - s3:*
                   Resource: arn:aws:s3:::${self:custom.s3.storiChallengeBucketName}/*
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource: "*"
 
 
