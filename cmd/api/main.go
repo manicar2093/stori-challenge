@@ -22,7 +22,7 @@ var (
 
 //	@title		stori_challenge
 //	@BasePath	/api/v1
-//	@version	0.0.0
+//	@version	0.1.0
 func main() {
 	var (
 		echoInstance       = echo.New()
