@@ -12,3 +12,9 @@ Dockerfile
 .golangci.yml
 mocks
 env.demo
+tmp
+scripts
+venv
+.github
+*.db
+.serverless

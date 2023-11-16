@@ -9,7 +9,7 @@ else
 endif
 
 run_demo: build_image
-	@ docker run --rm --env-file ./env.demo -p 8000:5001 -v demo_vol:/data --name stori_challenge-demo stori_challenge:latest
+	docker run --rm --env-file ./env.demo -p 8000:5001 -v demo_vol:/data --name stori_challenge-demo stori_challenge:latest
 
 build:
 	@ go build -o ./.bin/api/server cmd/api/*.go
