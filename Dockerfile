@@ -8,11 +8,10 @@ RUN go mod download
 RUN go build -o server cmd/api/*.go
 
 FROM alpine:latest
-
-WORKDIR /api
-
 COPY --from=builder /app/server /server
-COPY files files/
+
+WORKDIR /data
+COPY files files
 
 EXPOSE 8000
 
