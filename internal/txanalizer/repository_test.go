@@ -35,9 +35,9 @@ var _ = Describe("Turso", func() {
 
 			Expect(repo.Create(input)).To(Succeed())
 
-			var found txanalizer.Transaction
-			conn.Where("id = 0").First(&found)
-			Expect(found.AccountId).To(Equal(expectedAccountId))
+			var foundCounter int64
+			conn.Table("transactions").Where("account_id", expectedAccountId).Count(&foundCounter)
+			Expect(foundCounter).To(Equal(int64(len(input.Transactions))))
 		})
 	})
 
